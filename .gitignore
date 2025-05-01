@@ -1,0 +1,12 @@
+*
+!dockerfile
+!*/
+!*.py
+!*.yaml
+!.gitignore
+!*/
+!*.yaml
+!requirements.txt
+!*.tf
+!*.html
+!*.sh
