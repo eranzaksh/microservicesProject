@@ -1,5 +1,5 @@
 *
-!dockerfile
+!Dockerfile
 !*/
 !*.py
 !*.yaml
@@ -10,3 +10,4 @@
 !*.tf
 !*.html
 !*.sh
+!.dockerignore

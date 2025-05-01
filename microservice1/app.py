@@ -36,7 +36,6 @@ def send_email():
 
     token = req_data['token']
     data = req_data['data']
-    print(data)
 
     # Validate token
     try:

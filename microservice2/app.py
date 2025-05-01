@@ -6,9 +6,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-AWS_REGION = 'eu-north-1'
-sqs = boto3.client('sqs', region_name=AWS_REGION)
-s3 = boto3.client('s3', region_name=AWS_REGION)
+
+sqs = boto3.client('sqs', region_name=os.getenv('AWS_REGION'))
+s3 = boto3.client('s3', region_name=os.getenv('AWS_REGION'))
 
 SQS_QUEUE_URL = os.getenv('SQS_QUEUE_URL')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
