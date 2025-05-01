@@ -1,25 +1,50 @@
-name: Microservice1 CI Build & Push to Docker Hub
+name: Microservice1 CI Lint with Pylint, Build & Push to Docker Hub
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'microservice1/**'    # change to microservice2/** in the other workflow
+      - 'microservice1/**' 
 
 jobs:
-  build-and-push:
+  lint:
+    name: Lint Python Code with Pylint
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 3) Build & push
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'       
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r microservice1/requirements.txt
+          pip install pylint
+
+      - name: Run Pylint
+        run: |
+          pylint --fail-under=5 microservice1/            
+
+  build-and-push:
+    name: Build & Push Docker Image
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: ./microservice1
           file:    ./microservice1/Dockerfile
           push:    true
-          tags:    eranzaksh/microservice1:latest, eranzaksh/microservice1:${{ github.sha }} 
+          tags: |
+            your-user/microservice1:latest
+            your-user/microservice1:${{ github.sha }}
