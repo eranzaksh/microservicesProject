@@ -19,7 +19,7 @@ def get_token_from_ssm():
     response = ssm.get_parameter(Name=TOKEN_PARAM_NAME, WithDecryption=True)
     return response['Parameter']['Value']
 
-# To check if email is not old and timestamp is valid
+# To check if email is not old and timestamp is valid.
 def is_valid_timestream(timestream):
     try:
         timestamp = int(timestream)
