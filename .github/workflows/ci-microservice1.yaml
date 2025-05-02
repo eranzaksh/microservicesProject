@@ -35,9 +35,6 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
 
-    outputs:
-      image: ${{ steps.build.outputs.image }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -48,7 +45,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      - id: build
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -82,7 +79,7 @@ jobs:
         with:
           family:         ms1-task                  # your task family
           container-name: ms1
-          image:          ${{ steps.build.outputs.image }}
+          image:          ${{ secrets.DOCKERHUB_USERNAME }}/microservice1:${{ github.sha }}
           env-variables: |
             SQS_QUEUE_URL=${{ secrets.SQS_QUEUE_URL }}
             TOKEN_PARAM_NAME=${{ secrets.TOKEN_PARAM_NAME }}
