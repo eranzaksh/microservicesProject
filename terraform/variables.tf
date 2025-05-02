@@ -15,15 +15,3 @@ variable "private_subnet_cidrs" {
   description = "Private Subnet CIDR values"
   default     = ["10.1.3.0/24", "10.1.4.0/24"]
 }
-
-variable "desired_ingress_count" {
-  description = "Desired number of ingress service tasks"
-  type        = number
-  default     = 2
-}
-
-variable "desired_worker_count" {
-  description = "Desired number of worker service tasks"
-  type        = number
-  default     = 1
-}

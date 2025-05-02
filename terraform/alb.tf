@@ -8,7 +8,7 @@ resource "aws_lb" "alb" {
 
 resource "aws_lb_target_group" "ingress_tg" {
   name     = "ingress-tg"
-  port     = 5000
+  port     = 8000
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
   health_check {

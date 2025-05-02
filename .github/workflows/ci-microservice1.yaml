@@ -1,10 +1,10 @@
-name: Microservice1 CI Lint with Pylint, Build & Push to Docker Hub
+name: Microservice1 CI Lint with Pylint, Build, Push & CD to ECS
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'microservice1/**' 
+      - 'microservice1/**'
 
 jobs:
   lint:
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.x'       
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Pylint
         run: |
-          pylint --fail-under=5 microservice1/            
+          pylint --fail-under=5 microservice1/
 
   build-and-push:
     name: Build & Push Docker Image
@@ -46,5 +46,58 @@ jobs:
           file:    ./microservice1/Dockerfile
           push:    true
           tags: |
-            your-user/microservice1:latest
-            your-user/microservice1:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/microservice1:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/microservice1:${{ github.sha }}
+
+  deploy:
+    name: CD to ECS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            eu-north-1
+
+      - name: Register ECS Task Definition
+        run: |
+          aws ecs register-task-definition \
+            --family ms1-task \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 256 \
+            --memory 512 \
+            --execution-role-arn arn:aws:iam::<your_account_id>:role/ecsTaskExecutionRole \
+            --task-role-arn arn:aws:iam::<your_account_id>:role/ms1TaskRole \
+            --container-definitions '[
+              {
+                "name": "ms1",
+                "image": "${{ secrets.DOCKERHUB_USERNAME }}/microservice1:latest",
+                "essential": true,
+                "portMappings": [
+                  {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                  }
+                ],
+                "environment": [
+                  { "name": "SQS_QUEUE_URL", "value": "${{ secrets.SQS_QUEUE_URL }}" },
+                  { "name": "TOKEN_PARAM_NAME", "value": "/myapp/token" },
+                  { "name": "AWS_REGION", "value": "eu-west-1" }
+                ]
+              }
+            ]'
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster eran-ecs-cluster
+            --service ms1-service
+            --force-new-deployment
