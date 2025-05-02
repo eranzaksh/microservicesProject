@@ -77,10 +77,10 @@ jobs:
         id: render
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          family:         ms1-task                  # your task family
+          task-definition-family: ms1-task                  # your task family
           container-name: ms1
           image:          ${{ secrets.DOCKERHUB_USERNAME }}/microservice1:${{ github.sha }}
-          env-variables: |
+          environment-variables: |
             SQS_QUEUE_URL=${{ secrets.SQS_QUEUE_URL }}
             TOKEN_PARAM_NAME=${{ secrets.TOKEN_PARAM_NAME }}
             AWS_REGION=${{ secrets.AWS_REGION }}
