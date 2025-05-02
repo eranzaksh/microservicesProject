@@ -13,7 +13,7 @@ s3 = boto3.client('s3', region_name=os.getenv('AWS_REGION'))
 SQS_QUEUE_URL = os.getenv('SQS_QUEUE_URL')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
-# Read messages from queue
+# Read messages from queue.
 def process_messages():
     while True:
         response = sqs.receive_message(
