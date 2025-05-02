@@ -11,8 +11,10 @@ resource "aws_lb_target_group" "ingress_tg" {
   port     = 8000
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
+  target_type = "ip"
+  
   health_check {
-    path                = "/ingest"
+    path                = "/"
     protocol            = "HTTP"
     healthy_threshold   = 2
     unhealthy_threshold = 5

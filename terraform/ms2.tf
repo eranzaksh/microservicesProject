@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "ms2_task" {
-  family                   = "ms1-task"
+  family                   = "ms2-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "ms2_task" {
   container_definitions = jsonencode([
     {
       name      = "ms2"
-      image     = "nginx:alpine" 
+      image     = "eranzaksh/microservice2:latest" 
       essential = true
 
       environment = [
@@ -34,7 +34,7 @@ resource "aws_ecs_service" "ms2_service" {
   task_definition = aws_ecs_task_definition.ms2_task.arn
 
   network_configuration {
-    subnets         = var.private_subnets
+    subnets         = module.vpc.private_subnets
     security_groups = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }

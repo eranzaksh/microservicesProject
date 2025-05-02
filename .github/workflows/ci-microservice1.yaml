@@ -65,39 +65,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            eu-north-1
 
-      - name: Register ECS Task Definition
-        run: |
-          aws ecs register-task-definition \
-            --family ms1-task \
-            --network-mode awsvpc \
-            --requires-compatibilities FARGATE \
-            --cpu 256 \
-            --memory 512 \
-            --execution-role-arn arn:aws:iam::<your_account_id>:role/ecsTaskExecutionRole \
-            --task-role-arn arn:aws:iam::<your_account_id>:role/ms1TaskRole \
-            --container-definitions '[
-              {
-                "name": "ms1",
-                "image": "${{ secrets.DOCKERHUB_USERNAME }}/microservice1:latest",
-                "essential": true,
-                "portMappings": [
-                  {
-                    "containerPort": 8000,
-                    "hostPort": 8000,
-                    "protocol": "tcp"
-                  }
-                ],
-                "environment": [
-                  { "name": "SQS_QUEUE_URL", "value": "${{ secrets.SQS_QUEUE_URL }}" },
-                  { "name": "TOKEN_PARAM_NAME", "value": "/myapp/token" },
-                  { "name": "AWS_REGION", "value": "eu-west-1" }
-                ]
-              }
-            ]'
+      - name: Render new task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          family:         ms1-task                  # your task family
+          container-name: ms1
+          image:          ${{ steps.build.outputs.image }}
+          env-variables: |
+            SQS_QUEUE_URL=${{ secrets.SQS_QUEUE_URL }}
+            TOKEN_PARAM_NAME=${{ secrets.TOKEN_PARAM_NAME }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
 
-      - name: Update ECS service
-        run: |
-          aws ecs update-service \
-            --cluster eran-ecs-cluster
-            --service ms1-service
-            --force-new-deployment
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service:         ms1-service
+          cluster:         eran-ecs-cluster

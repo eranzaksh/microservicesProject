@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "ms1_task" {
   container_definitions = jsonencode([
     {
       name      = "ms1"
-      image     = "nginx:alpine" 
+      image     = "eranzaksh/microservice1:latest" 
       essential = true
       portMappings = [
         {
@@ -42,7 +42,7 @@ resource "aws_ecs_service" "ms1_service" {
   task_definition = aws_ecs_task_definition.ms1_task.arn
 
   network_configuration {
-    subnets         = var.private_subnets
+    subnets         = module.vpc.private_subnets
     security_groups = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }
@@ -51,6 +51,7 @@ resource "aws_ecs_service" "ms1_service" {
     target_group_arn = aws_lb_target_group.ingress_tg.arn
     container_name   = "ms1"
     container_port   = 8000
+    
   }
 
   depends_on = [aws_lb_listener.http]

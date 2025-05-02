@@ -1,10 +1,10 @@
-name: Microservice2 CI Lint with Pylint, Build & Push to Docker Hub
+name: Microservice2 CI Lint with Pylint, Build, Push & CD to ECS
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'microservice2/**' 
+      - 'microservice2/**'
 
 jobs:
   lint:
@@ -15,20 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.x'       
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r microservice2/requirements.txt
+          pip install -r microservice1/requirements.txt
           pip install pylint
 
       - name: Run Pylint
         run: |
-          pylint --fail-under=5 microservice2/            
+          pylint --fail-under=5 microservice2/
 
   build-and-push:
     name: Build & Push Docker Image
@@ -46,5 +46,40 @@ jobs:
           file:    ./microservice2/Dockerfile
           push:    true
           tags: |
-            your-user/microservice2:latest
-            your-user/microservice2:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/microservice2:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/microservice2:${{ github.sha }}
+
+  deploy:
+    name: CD to ECS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            eu-north-1
+
+      - name: Render new task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          family:         ms2-task                  # your task family
+          container-name: ms2
+          image:          ${{ steps.build.outputs.image }}
+          env-variables: |
+            SQS_QUEUE_URL=${{ secrets.SQS_QUEUE_URL }}
+            S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service:         ms2-service
+          cluster:         eran-ecs-cluster

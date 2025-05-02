@@ -59,5 +59,9 @@ def send_email():
 
     return jsonify({"status": "Message sent to SQS"}), 200
 
+@app.route("/", methods=["GET"])
+def health_root():
+    return "OK", 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
