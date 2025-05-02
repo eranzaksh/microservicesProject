@@ -79,7 +79,7 @@ jobs:
         with:
           task-definition-family: ms2-task                  # your task family
           container-name: ms2
-          image:          ${{ secrets.DOCKERHUB_USERNAME }}/microservice1:${{ github.sha }}
+          image:          ${{ secrets.DOCKERHUB_USERNAME }}/microservice2:${{ github.sha }}
           environment-variables: |
             SQS_QUEUE_URL=${{ secrets.SQS_QUEUE_URL }}
             S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
