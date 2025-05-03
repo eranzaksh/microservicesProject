@@ -11,12 +11,12 @@ s3 = boto3.client('s3', region_name=os.getenv('AWS_REGION'))
 SQS_QUEUE_URL = os.getenv('SQS_QUEUE_URL')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
-# Read messages from queue with cron job //Need to think about sstill making it while true
+# Read messages from queue with cron job
 def process_messages():
     response = sqs.receive_message(
         QueueUrl=SQS_QUEUE_URL,
-        MaxNumberOfMessages=10,
-        WaitTimeSeconds=10  # long polling
+        MaxNumberOfMessages=2,
+        WaitTimeSeconds=5
     )
 
     messages = response.get('Messages', [])

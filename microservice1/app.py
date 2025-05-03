@@ -20,14 +20,14 @@ def get_token_from_ssm():
     response = ssm.get_parameter(Name=TOKEN_PARAM_NAME, WithDecryption=True)
     return response['Parameter']['Value']
 
-#Checks if the input is a valid Unix timestamp (in seconds).
+# Checks if the input is a valid Unix timestamp (in seconds) return True or False.
 def is_valid_timestream(ts) -> bool:
     if ts is None:
         return False
     try:
         # Convert to int if it's a string
         ts_int = int(ts)
-        # Check for a reasonable range (e.g., years 1970–2100)
+        # Check for a reasonable range (years 1970–2100)
         if ts_int < 0 or ts_int > 4102444800:  # 4102444800 = 2100-01-01 00:00:00 UTC which is maximum
             return False
         # Try to convert to a datetime, if error will return false.
@@ -51,7 +51,7 @@ def send_email():
         expected_token = get_token_from_ssm()
     except Exception as e:
         return jsonify({"error": f"Token fetch error: {str(e)}"}), 500
-
+    # If token in the mail != from the expected token return forbidden 403
     if token != expected_token:
         return jsonify({"error": "Invalid token"}), 403
 
