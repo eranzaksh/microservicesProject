@@ -241,7 +241,7 @@ Follow these steps to replicate this environment:
 
 4. **Configure GitHub Secrets**
    - Go to your repository's Settings > Secrets and variables > Actions
-   - Add all required secrets listed above
+   - [Add all required secrets listed above] (#required-github-secrets)
    - Ensure AWS credentials have necessary permissions
 
 5. **Docker Hub Setup**
