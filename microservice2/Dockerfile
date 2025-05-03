@@ -5,7 +5,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY app.py .
+COPY . .
+RUN chmod +x /app/entrypoint.sh
 
 # Install cron
 RUN apt-get update && apt-get install -y cron
@@ -17,5 +18,5 @@ RUN chmod 0644 /etc/cron.d/sqs_backup
 # Apply cron job
 RUN crontab /etc/cron.d/sqs_backup
 
-# Start cron service
-CMD ["cron", "-f"]
+# Start the entrypoint script
+CMD ["/app/entrypoint.sh"]
