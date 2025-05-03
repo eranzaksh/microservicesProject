@@ -262,7 +262,8 @@ Follow these steps to replicate this environment:
    - Confirm all environment variables are set
    - Verify AWS CLI configuration
    - Check Python virtual environment activation
-   
+
+
 ## API Documentation
 
 ### Health Check
