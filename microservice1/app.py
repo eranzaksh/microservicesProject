@@ -55,7 +55,7 @@ def send_email():
     if token != expected_token:
         return jsonify({"error": "Invalid token"}), 403
 
-    # Validate timestream
+    # Validate timestream according to unix epoch
     timestream = data.get("email_timestream")
     if not timestream or not is_valid_timestream(timestream):
         return jsonify({"error": "Invalid or missing email_timestream"}), 400
