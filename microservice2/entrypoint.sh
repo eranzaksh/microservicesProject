@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-# Start your main application
-python /app/app.py &
+# Start cron service in the background
+cron -f &
 
-cron -f
+# Start your main application
+python /app/app.py

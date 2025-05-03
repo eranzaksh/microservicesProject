@@ -283,16 +283,13 @@ Follow these steps to replicate this environment:
    - Confirm resources are in the correct region
    - Verify IAM roles and policies are properly configured
    - Check VPC and subnet configurations
+   - Wait for ECS to finish deploying after pushing new code
 
 3. **Docker Issues**
    - Ensure Docker daemon is running
    - Verify Docker Hub login credentials
    - Check image build logs for errors
 
-4. **Local Development**
-   - Confirm all environment variables are set
-   - Verify AWS CLI configuration
-   - Check Python virtual environment activation
 
 ---
 For more information about the CI/CD process, see the `.github` directory.
