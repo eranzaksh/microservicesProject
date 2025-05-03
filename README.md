@@ -66,10 +66,9 @@ graph LR
 │   └── requirements.txt           # Dependencies: boto3, python-dotenv
 ├── terraform/
 │   ├── modules/
-│   │   ├── ecs/                  # ECS cluster configuration
 │   │   └── vpc/                  # Network configuration
 │   ├── main.tf                   # Core infrastructure setup
-│   ├── sqs_s3.tf                 # Queue and bucket configuration
+│   ├── ecr.tf                    # Create ECS cluster
 │   └── [other .tf files]         # Additional infrastructure components
 └── .github/                      # CI/CD configurations
 ```
@@ -132,22 +131,6 @@ Required variables in `terraform/variables.tf`:
 - Python 3.x
 - Docker
 
-### Local Development
-```bash
-# Setup Microservice1
-cd microservice1
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python app.py  # Runs on port 8000
-
-# Setup Microservice2
-cd ../microservice2
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python app.py
-```
 
 ### Infrastructure Deployment
 ```bash
@@ -186,57 +169,147 @@ terraform apply
   - SSM Parameter Store for sensitive data
   - Environment variable protection
 
-## Monitoring and Troubleshooting
 
-### Service Health
-- API health endpoint: `GET /`
-- Container health checks in ECS
-- CloudWatch container logs
+## CI/CD Pipeline
 
-### Queue Monitoring
-- SQS metrics in CloudWatch
-- Queue depth monitoring
-- Message age tracking
-- Dead letter queue support
+### GitHub Actions Workflow
 
-### Storage Monitoring
-- S3 bucket metrics
-- Object lifecycle management
-- Storage class optimization
+The project uses GitHub Actions for continuous integration and deployment. The pipeline includes:
 
-### Infrastructure
-- Terraform state in S3
-- AWS CloudWatch metrics
-- VPC Flow Logs
+1. **Build & Test**
+   - Lint Python code
+   - Run unit tests
+   - Build Docker images
+   - Push to Docker Hub
 
-## Development Guidelines
+2. **Infrastructure**
+   - Terraform validation
+   - Infrastructure deployment
+   - AWS resource provisioning
 
-### Code Standards
-- Follow PEP 8 for Python code
-- Use consistent Terraform formatting
-- Document all API endpoints
-- Maintain test coverage
+3. **Deploy**
+   - Deploy microservices to ECS
+   - Health check verification
+   - Infrastructure validation
 
-### Git Workflow
-1. Create feature branch
-2. Implement changes
-3. Run tests locally
-4. Submit pull request
-5. Wait for CI/CD validation
-6. Merge after approval
+### Required GitHub Secrets
 
-### Documentation
-- Update README for significant changes
-- Document new environment variables
-- Maintain API documentation
-- Update architecture diagrams
+Configure the following secrets in your GitHub repository (Settings > Secrets and variables > Actions):
 
-### Testing
-- Unit tests for both services
-- Integration tests for API
-- Load testing for queue processing
-- Infrastructure validation tests
+| Secret Name | Description |
+|------------|-------------|
+| AWS_ACCESS_KEY_ID | AWS access key for authentication |
+| AWS_SECRET_ACCESS_KEY | AWS secret key for authentication |
+| AWS_REGION | AWS region (e.g., eu-north-1) |
+| DOCKERHUB_USERNAME | Docker Hub username for image push |
+| DOCKERHUB_TOKEN | Docker Hub access token |
+| S3_BUCKET_NAME | S3 bucket for email storage |
+| SQS_QUEUE_URL | SQS queue URL for message processing |
+| TOKEN_PARAM_NAME | SSM parameter name for API token |
+
+## Repository Replication Guide
+
+Follow these steps to replicate this environment:
+
+1. **Fork the Repository**
+   ```bash
+   # Clone your forked repository
+   git clone https://github.com/YOUR_USERNAME/microservicesProject.git
+   cd microservicesProject
+   ```
+
+2. **Configure GitHub Secrets**
+   - Go to your repository's Settings > Secrets and variables > Actions
+   - Add all required secrets listed above
+   - Ensure AWS credentials have necessary permissions
+
+3. **AWS Prerequisites**
+   ```bash
+   # Create S3 bucket for Terraform state
+   aws s3 mb s3://microservices-terraform-state-bucket --region eu-north-1
+
+   # Create SSM parameter for API token
+   aws ssm put-parameter \
+       --name "your-token-param-name" \
+       --value "your-secure-token" \
+       --type SecureString \
+       --region eu-north-1
+   ```
+
+4. **Docker Hub Setup**
+   - Create Docker Hub account if needed
+   - Generate access token: Account Settings > Security > New Access Token
+   - Add token to GitHub secrets
+
+5. **Infrastructure Deployment**
+   ```bash
+   # Initialize and apply Terraform configuration
+   cd terraform
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+
+6. **Local Development Setup**
+   ```bash
+   # Setup Python virtual environment for each service
+   python -m venv venv
+   source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+   
+   # Install dependencies
+   pip install -r microservice1/requirements.txt
+   pip install -r microservice2/requirements.txt
+   ```
+
+7. **Environment Variables**
+   Create `.env` files for local development:
+   ```bash
+   # microservice1/.env
+   AWS_REGION=eu-north-1
+   TOKEN_PARAM_NAME=your-token-param-name
+   SQS_QUEUE_URL=your-sqs-url
+
+   # microservice2/.env
+   AWS_REGION=eu-north-1
+   SQS_QUEUE_URL=your-sqs-url
+   S3_BUCKET_NAME=your-bucket-name
+   ```
+
+8. **Verify Setup**
+   ```bash
+   # Test API service
+   curl http://localhost:8000/
+
+   # Monitor SQS queue
+   aws sqs get-queue-attributes \
+       --queue-url $SQS_QUEUE_URL \
+       --attribute-names ApproximateNumberOfMessages
+
+   # Check S3 bucket
+   aws s3 ls s3://$S3_BUCKET_NAME
+   ```
+
+### Common Issues and Troubleshooting
+
+1. **GitHub Actions Failures**
+   - Verify all secrets are correctly configured
+   - Check AWS credentials have sufficient permissions
+   - Ensure Docker Hub credentials are valid
+
+2. **AWS Resource Issues**
+   - Confirm resources are in the correct region
+   - Verify IAM roles and policies are properly configured
+   - Check VPC and subnet configurations
+
+3. **Docker Issues**
+   - Ensure Docker daemon is running
+   - Verify Docker Hub login credentials
+   - Check image build logs for errors
+
+4. **Local Development**
+   - Confirm all environment variables are set
+   - Verify AWS CLI configuration
+   - Check Python virtual environment activation
 
 ---
 For more information about the CI/CD process, see the `.github` directory.
-
