@@ -1,4 +1,4 @@
-# Checkpoint Microservices Project
+# Microservices Project
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Terraform](https://img.shields.io/badge/terraform-%3E%3D1.2-blue)

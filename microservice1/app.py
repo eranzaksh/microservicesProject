@@ -22,6 +22,8 @@ def get_token_from_ssm():
 
 #Checks if the input is a valid Unix timestamp (in seconds).
 def is_valid_timestream(ts) -> bool:
+    if ts is None:
+        return False
     try:
         # Convert to int if it's a string
         ts_int = int(ts)
@@ -31,7 +33,7 @@ def is_valid_timestream(ts) -> bool:
         # Try to convert to a datetime, if error will return false.
         time.gmtime(ts_int)
         return True
-    except (ValueError, OverflowError):
+    except (ValueError, OverflowError, TypeError):
         return False
 
 @app.route('/send-email', methods=['POST'])
