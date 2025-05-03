@@ -27,8 +27,8 @@ def is_valid_timestream(ts) -> bool:
     try:
         # Convert to int if it's a string
         ts_int = int(ts)
-        # Optionally, check for a reasonable range (e.g., years 1970–2100)
-        if ts_int < 0 or ts_int > 4102444800:  # 4102444800 = 2100-01-01 00:00:00 UTC
+        # Check for a reasonable range (e.g., years 1970–2100)
+        if ts_int < 0 or ts_int > 4102444800:  # 4102444800 = 2100-01-01 00:00:00 UTC which is maximum
             return False
         # Try to convert to a datetime, if error will return false.
         time.gmtime(ts_int)
