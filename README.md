@@ -4,7 +4,7 @@
 ![Terraform](https://img.shields.io/badge/terraform-%3E%3D1.2-blue)
 ![Python](https://img.shields.io/badge/python-3.x-blue)
 
-A distributed email processing system built with Python microservices and AWS infrastructure. The system provides a secure API for email data ingestion and reliable background processing for S3 storage.
+A distributed email processing system built with Python microservices and AWS infrastructure lavraging ECS. The system provides a secure API for email data ingestion and reliable background processing for S3 storage. both microservices resides in a private subnet with no public ip.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -157,8 +157,8 @@ terraform apply
 
 - **Authentication**: Token-based API authentication via SSM
 - **Network Security**: 
-  - VPC with public/private subnet isolation
-  - Security groups for service access control
+  - VPC with private subnet isolation
+  - Security groups for service access control, only the ALB sg is allowed to access microservice1.
 - **Message Security**:
   - SQS queue with 30s visibility timeout
   - Message deletion post-processing
@@ -233,7 +233,8 @@ Follow these steps to replicate this environment:
 
 3. **Infrastructure Deployment**
    ```bash
-   # Initialize and apply Terraform configuration. The output will give you SQS url for github secrets and ALB dns for POST.
+   # Add your-token-param-name to tfvars (variable name: token_param_name) then Initialize and apply Terraform configuration. 
+   # The output will give you SQS url for github secrets and ALB dns for POST.
    cd terraform
    terraform init
    terraform plan
