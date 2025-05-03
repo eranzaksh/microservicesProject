@@ -218,12 +218,7 @@ Follow these steps to replicate this environment:
    cd microservicesProject
    ```
 
-2. **Configure GitHub Secrets**
-   - Go to your repository's Settings > Secrets and variables > Actions
-   - Add all required secrets listed above
-   - Ensure AWS credentials have necessary permissions
-
-3. **AWS Prerequisites**
+2. **AWS Prerequisites**
    ```bash
    # Create S3 bucket for Terraform state
    aws s3 mb s3://microservices-terraform-state-bucket --region eu-north-1
@@ -236,58 +231,46 @@ Follow these steps to replicate this environment:
        --region eu-north-1
    ```
 
-4. **Docker Hub Setup**
-   - Create Docker Hub account if needed
-   - Generate access token: Account Settings > Security > New Access Token
-   - Add token to GitHub secrets
-
-5. **Infrastructure Deployment**
+3. **Infrastructure Deployment**
    ```bash
-   # Initialize and apply Terraform configuration
+   # Initialize and apply Terraform configuration. The output will give you SQS url for github secrets and ALB dns for POST.
    cd terraform
    terraform init
    terraform plan
    terraform apply
    ```
 
-6. **Local Development Setup**
+4. **Configure GitHub Secrets**
+   - Go to your repository's Settings > Secrets and variables > Actions
+   - Add all required secrets listed above
+   - Ensure AWS credentials have necessary permissions
+
+5. **Docker Hub Setup**
+   - Create Docker Hub account if needed
+   - Generate access token: Account Settings > Security > New Access Token
+   - Add token to GitHub secrets
+
+6. **Push code for microservice 1 and 2 to github**
    ```bash
-   # Setup Python virtual environment for each service
-   python -m venv venv
-   source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+   # CI/CD pipeline for each microservice will start running.
+   ```
+
+7. **Test the environment**
+   ```bash
+   curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {
+          "email_subject":  "Test",
+          "email_timestream":"1746192966",
+          "email_sender":   "Eran Zaksh",
+          "email_content":  "Testing email validity microservice"
+        },
+        "token": "your-token"
+      }' \
+  http://your-ALB-dns/send-email
+  ```
    
-   # Install dependencies
-   pip install -r microservice1/requirements.txt
-   pip install -r microservice2/requirements.txt
-   ```
-
-7. **Environment Variables**
-   Create `.env` files for local development:
-   ```bash
-   # microservice1/.env
-   AWS_REGION=eu-north-1
-   TOKEN_PARAM_NAME=your-token-param-name
-   SQS_QUEUE_URL=your-sqs-url
-
-   # microservice2/.env
-   AWS_REGION=eu-north-1
-   SQS_QUEUE_URL=your-sqs-url
-   S3_BUCKET_NAME=your-bucket-name
-   ```
-
-8. **Verify Setup**
-   ```bash
-   # Test API service
-   curl http://localhost:8000/
-
-   # Monitor SQS queue
-   aws sqs get-queue-attributes \
-       --queue-url $SQS_QUEUE_URL \
-       --attribute-names ApproximateNumberOfMessages
-
-   # Check S3 bucket
-   aws s3 ls s3://$S3_BUCKET_NAME
-   ```
 
 ### Common Issues and Troubleshooting
 
