@@ -1,9 +1,6 @@
 flask
 boto3
 python-dotenv
-
-# Testing dependencies
 pytest
 pytest-flask
 pytest-cov
-moto>=4.0.0

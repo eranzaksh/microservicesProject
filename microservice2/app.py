@@ -1,6 +1,4 @@
 import boto3
-import time
-import json
 import uuid
 import os
 from dotenv import load_dotenv
