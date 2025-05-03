@@ -15,23 +15,29 @@ sqs = boto3.client('sqs', region_name=os.getenv('AWS_REGION'))
 TOKEN_PARAM_NAME = os.getenv('TOKEN_PARAM_NAME')
 SQS_QUEUE_URL = os.getenv('SQS_QUEUE_URL')
 
+# Getting token from ssm using aws credentials
 def get_token_from_ssm():
     response = ssm.get_parameter(Name=TOKEN_PARAM_NAME, WithDecryption=True)
     return response['Parameter']['Value']
 
-# To check if email is not old and timestamp is valid. test against present time.
-def is_valid_timestream(timestream):
+#Checks if the input is a valid Unix timestamp (in seconds).
+def is_valid_timestream(ts) -> bool:
     try:
-        timestamp = int(timestream)
-        now = int(time.time())
-        return abs(now - timestamp) <= 86400  # Allow 24-hour window
-    except:
+        # Convert to int if it's a string
+        ts_int = int(ts)
+        # Optionally, check for a reasonable range (e.g., years 1970–2100)
+        if ts_int < 0 or ts_int > 4102444800:  # 4102444800 = 2100-01-01 00:00:00 UTC
+            return False
+        # Try to convert to a datetime, if error will return false.
+        time.gmtime(ts_int)
+        return True
+    except (ValueError, OverflowError):
         return False
 
 @app.route('/send-email', methods=['POST'])
 def send_email():
     req_data = request.get_json()
-
+    # Check if there is data at all and a token
     if not req_data or 'token' not in req_data or 'data' not in req_data:
         return jsonify({"error": "Missing token or data"}), 400
 
