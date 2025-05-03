@@ -1,6 +1,17 @@
 *
 !README.md
 !Dockerfile
+.pytest_cache/
+!*.py
+!*.yaml
+!.gitignore
+!*/
+!*.yaml
+!requirements.txt
+!*.tf
+!*.html
+!*.sh
+!.dockerignore
 # Virtual Environment patterns
 venv/
 venv/*
@@ -14,14 +25,3 @@ venv/*
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
-!*.py
-!*.yaml
-!.gitignore
-!*/
-!*.yaml
-!requirements.txt
-!*.tf
-!*.html
-!*.sh
-!.dockerignore
