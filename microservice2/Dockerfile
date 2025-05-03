@@ -12,7 +12,7 @@ RUN chmod +x /app/entrypoint.sh
 RUN apt-get update && apt-get install -y cron
 
 # Create a cron job file every minute
-RUN echo "* * * * * python /app/app.py" > /etc/cron.d/sqs_backup
+RUN echo "*/5 * * * * python /app/app.py" > /etc/cron.d/sqs_backup
 RUN chmod 0644 /etc/cron.d/sqs_backup
 
 # Apply cron job
