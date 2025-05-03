@@ -5,6 +5,10 @@ on:
     branches: [ main ]
     paths:
       - 'microservice1/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'microservice1/**'
 
 jobs:
   lint:
