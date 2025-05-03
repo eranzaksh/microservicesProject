@@ -271,7 +271,7 @@ Follow these steps to replicate this environment:
            "token": "your-token"
          }' \
      http://your-ALB-dns/send-email
-  ```
+     ```
    
 
 ### Common Issues and Troubleshooting
