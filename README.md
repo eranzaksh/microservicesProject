@@ -104,7 +104,7 @@ Content-Type: application/json
 
 ## Message Processing Flow
 
-1. Client sends authenticated POST request to /send-email
+1. Client sends authenticated POST request to alb-dns/send-email
 2. Microservice1:
    - Validates authentication token against SSM
    - Validates email timestamp
@@ -141,15 +141,11 @@ The project uses GitHub Actions for continuous integration and deployment. The p
 
 1. **Build & Test**
    - Lint Python code
-   - Run unit tests
+   - Run unit tests (Testing validity of email timestream, token and data)
    - Build Docker images
    - Push to Docker Hub
 
-2. **Infrastructure**
-   - Terraform validation
-   - Infrastructure deployment
-
-3. **Deploy**
+2. **Deploy**
    - Deploy microservices to ECS
    - Updating environments variable in ECS
 
