@@ -264,7 +264,7 @@ Follow these steps to replicate this environment:
    - Check Python virtual environment activation
 ```
 
-## API Documentation
+### API Documentation
 
 ### Health Check
 ```http
