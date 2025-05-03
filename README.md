@@ -256,19 +256,20 @@ Follow these steps to replicate this environment:
    ```
 
 7. **Test the environment**
+
    ```bash
    curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
-        "data": {
-          "email_subject":  "Test",
-          "email_timestream":"1746192966",
-          "email_sender":   "Eran Zaksh",
-          "email_content":  "Testing email validity microservice"
-        },
-        "token": "your-token"
-      }' \
-  http://your-ALB-dns/send-email
+     -H "Content-Type: application/json" \
+     -d '{
+           "data": {
+             "email_subject":  "Test",
+             "email_timestream":"1746192966",
+             "email_sender":   "Eran Zaksh",
+             "email_content":  "Testing email validity microservice"
+           },
+           "token": "your-token"
+         }' \
+     http://your-ALB-dns/send-email
   ```
    
 
