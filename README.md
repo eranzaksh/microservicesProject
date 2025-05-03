@@ -11,11 +11,10 @@ A distributed email processing system built with Python microservices and AWS in
 - [System Architecture](#system-architecture)
 - [Project Structure](#project-structure)
 - [API Documentation](#api-documentation)
-- [Configuration](#configuration)
-- [Setup and Installation](#setup-and-installation)
 - [Message Processing Flow](#message-processing-flow)
 - [Security](#security)
-- [Monitoring and Troubleshooting](#monitoring-and-troubleshooting)
+- [Configuration](#configuration)
+- [Setup and Installation](#setup-and-installation)
 - [Development Guidelines](#development-guidelines)
 
 ## Overview
@@ -47,9 +46,6 @@ graph LR
 - **ECR**: Container registry for service images
 - **VPC**: Network isolation with public/private subnets
 
-### Infrastructure State
-- Remote state in S3: "microservices-terraform-state-bucket"
-- Terraform version requirement: >= 1.2
 
 ## Project Structure
 
@@ -104,39 +100,6 @@ Content-Type: application/json
 {
   "status": "Message sent to SQS"
 }
-```
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Description | Service |
-|----------|-------------|----------|
-| AWS_REGION | AWS region  | Both |
-| TOKEN_PARAM_NAME | SSM parameter for auth token | Microservice1 |
-| SQS_QUEUE_URL | URL for devops-queue | Both |
-| S3_BUCKET_NAME | devops-assn-bucket-eranzaksh | Microservice2 |
-
-### Infrastructure Variables
-Required variables in `terraform/variables.tf`:
-- `aws_region`: AWS deployment region
-- `public_subnet_cidrs`: CIDR blocks for public subnets
-- `private_subnet_cidrs`: CIDR blocks for private subnets
-
-## Setup and Installation
-
-### Prerequisites
-- AWS CLI
-- Terraform >= 1.2
-- Python 3.x
-- Docker
-
-
-### Infrastructure Prerequisits
-```bash
-1. Create S3 bucket to save tfstate file in it
-2. Input the bucket name in main.tf > backend "s3"
-3. Update aws.region in variables.tf for your region
 ```
 
 ## Message Processing Flow
@@ -206,6 +169,42 @@ Configure the following secrets in your GitHub repository (Settings > Secrets an
 | SQS_QUEUE_URL | SQS queue URL for message processing |
 | TOKEN_PARAM_NAME | SSM parameter name for API token |
 
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Service |
+|----------|-------------|----------|
+| AWS_REGION | AWS region  | Both |
+| TOKEN_PARAM_NAME | SSM parameter for auth token | Microservice1 |
+| SQS_QUEUE_URL | URL for devops-queue | Both |
+| S3_BUCKET_NAME | devops-assn-bucket-eranzaksh | Microservice2 |
+
+### Infrastructure Variables
+Required variables in `terraform/variables.tf`:
+- `aws_region`: AWS deployment region
+- `public_subnet_cidrs`: CIDR blocks for public subnets
+- `private_subnet_cidrs`: CIDR blocks for private subnets
+- `token_param_name`: Path to token in ssm parameter store
+
+## Setup and Installation
+
+### Prerequisites
+- AWS CLI
+- Terraform >= 1.2
+- Python 3.x
+- Docker
+
+
+### Infrastructure Prerequisits
+```bash
+1. Create S3 bucket to save tfstate file in it
+2. Input the bucket name in main.tf > backend "s3"
+3. Update aws.region in variables.tf for your region
+```
+
+
 ## Repository Replication Guide
 
 Follow these steps to replicate this environment:
@@ -220,19 +219,19 @@ Follow these steps to replicate this environment:
 2. **AWS Prerequisites**
    ```bash
    # Create S3 bucket for Terraform state
-   aws s3 mb s3://microservices-terraform-state-bucket --region eu-north-1
+   aws s3 mb s3://your-bucket-for-tfstate --region your-region
 
    # Create SSM parameter for API token
    aws ssm put-parameter \
        --name "your-token-param-name" \
        --value "your-secure-token" \
        --type SecureString \
-       --region eu-north-1
+       --region your-region
    ```
 
 3. **Infrastructure Deployment**
    ```bash
-   # Add your-token-param-name to tfvars (variable name: token_param_name) then Initialize and apply Terraform configuration. 
+   # Initialize and apply Terraform configuration. 
    # The output will give you SQS url for github secrets and ALB dns for POST requests.
    cd terraform
    terraform init
