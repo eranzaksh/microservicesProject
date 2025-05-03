@@ -23,7 +23,7 @@ A distributed email processing system built with Python microservices and AWS in
 This project implements a scalable email processing system using microservices architecture:
 - **Microservice1**: REST API service that receives and validates email requests
 - **Microservice2**: Background processor that stores validated email data in S3
-- **Infrastructure**: Managed through Terraform on AWS (eu-north-1)
+- **Infrastructure**: Managed through Terraform on AWS
 
 ## System Architecture
 
@@ -73,46 +73,13 @@ graph LR
 └── .github/                      # CI/CD configurations
 ```
 
-## API Documentation
-
-### Health Check
-```http
-GET /
-```
-Response: `"OK"` (200)
-
-### Send Email
-```http
-POST /send-email
-Content-Type: application/json
-
-{
-  "token": "your-auth-token",
-  "data": {
-    "email_timestream": "unix_timestamp",
-    "other_email_data": "..."
-  }
-}
-```
-
-#### Validation
-- Token must match SSM parameter store value
-- Timestream must be valid Unix timestamp (1970-2100)
-
-#### Success Response
-```json
-{
-  "status": "Message sent to SQS"
-}
-```
-
 ## Configuration
 
 ### Environment Variables
 
 | Variable | Description | Service |
 |----------|-------------|----------|
-| AWS_REGION | AWS region (eu-north-1) | Both |
+| AWS_REGION | AWS region  | Both |
 | TOKEN_PARAM_NAME | SSM parameter for auth token | Microservice1 |
 | SQS_QUEUE_URL | URL for devops-queue | Both |
 | S3_BUCKET_NAME | devops-assn-bucket-eranzaksh | Microservice2 |
@@ -126,7 +93,7 @@ Required variables in `terraform/variables.tf`:
 ## Setup and Installation
 
 ### Prerequisites
-- AWS CLI configured for eu-north-1
+- AWS CLI
 - Terraform >= 1.2
 - Python 3.x
 - Docker
@@ -148,7 +115,7 @@ terraform apply
    - Validates email timestamp
    - Sends valid messages to SQS queue
 3. Microservice2:
-   - Polls SQS queue (10 messages batch, 10s timeout)
+   - Polls SQS queue (2 messages batch, 5s timeout)
    - Processes messages and stores in S3
    - Generates UUID-based filenames for storage
    - Deletes processed messages from queue
@@ -295,6 +262,39 @@ Follow these steps to replicate this environment:
    - Confirm all environment variables are set
    - Verify AWS CLI configuration
    - Check Python virtual environment activation
+   
+## API Documentation
+
+### Health Check
+```http
+GET /
+```
+Response: `"OK"` (200)
+
+### Send Email
+```http
+POST /send-email
+Content-Type: application/json
+
+{
+  "token": "your-auth-token",
+  "data": {
+    "email_timestream": "unix_timestamp",
+    "other_email_data": "..."
+  }
+}
+```
+
+#### Validation
+- Token must match SSM parameter store value
+- Timestream must be valid Unix timestamp (1970-2100)
+
+#### Success Response
+```json
+{
+  "status": "Message sent to SQS"
+}
+```
 
 ---
 For more information about the CI/CD process, see the `.github` directory.
