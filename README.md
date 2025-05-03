@@ -132,12 +132,11 @@ Required variables in `terraform/variables.tf`:
 - Docker
 
 
-### Infrastructure Deployment
+### Infrastructure Prerequisits
 ```bash
-cd terraform
-terraform init
-terraform plan
-terraform apply
+1. Create S3 bucket to save tfstate file in it
+2. Input the bucket name in main.tf > backend "s3"
+3. Update aws.region in variables.tf for your region
 ```
 
 ## Message Processing Flow
@@ -200,7 +199,7 @@ Configure the following secrets in your GitHub repository (Settings > Secrets an
 |------------|-------------|
 | AWS_ACCESS_KEY_ID | AWS access key for authentication |
 | AWS_SECRET_ACCESS_KEY | AWS secret key for authentication |
-| AWS_REGION | AWS region (e.g., eu-north-1) |
+| AWS_REGION | AWS region |
 | DOCKERHUB_USERNAME | Docker Hub username for image push |
 | DOCKERHUB_TOKEN | Docker Hub access token |
 | S3_BUCKET_NAME | S3 bucket for email storage |
@@ -213,7 +212,7 @@ Follow these steps to replicate this environment:
 
 1. **Fork the Repository**
    ```bash
-   # Clone your forked repository
+   # Clone repository
    git clone https://github.com/YOUR_USERNAME/microservicesProject.git
    cd microservicesProject
    ```
@@ -234,7 +233,7 @@ Follow these steps to replicate this environment:
 3. **Infrastructure Deployment**
    ```bash
    # Add your-token-param-name to tfvars (variable name: token_param_name) then Initialize and apply Terraform configuration. 
-   # The output will give you SQS url for github secrets and ALB dns for POST.
+   # The output will give you SQS url for github secrets and ALB dns for POST requests.
    cd terraform
    terraform init
    terraform plan
