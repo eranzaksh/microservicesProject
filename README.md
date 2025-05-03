@@ -21,7 +21,7 @@ A distributed email processing system built with Python microservices and AWS in
 
 This project implements a scalable email processing system using microservices architecture:
 - **Microservice1**: REST API service that receives and validates email requests
-- **Microservice2**: Background processor that stores validated email data in S3
+- **Microservice2**: Background processor that stores validated email data in S3 using schedular laibrary
 - **Infrastructure**: Managed through Terraform on AWS
 
 ## System Architecture
@@ -114,6 +114,7 @@ Content-Type: application/json
    - Processes messages and stores in S3
    - Generates UUID-based filenames for storage
    - Deletes processed messages from queue
+   - Using schadular running every 5 minutes
 
 ## Security
 
@@ -147,12 +148,10 @@ The project uses GitHub Actions for continuous integration and deployment. The p
 2. **Infrastructure**
    - Terraform validation
    - Infrastructure deployment
-   - AWS resource provisioning
 
 3. **Deploy**
    - Deploy microservices to ECS
-   - Health check verification
-   - Infrastructure validation
+   - Updating environments variable in ECS
 
 ### Required GitHub Secrets
 
