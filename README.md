@@ -73,6 +73,7 @@ graph LR
 └── .github/                      # CI/CD configurations
 ```
 
+
 ## Configuration
 
 ### Environment Variables
@@ -242,7 +243,7 @@ Follow these steps to replicate this environment:
    
 
 ### Common Issues and Troubleshooting
-```
+
 1. **GitHub Actions Failures**
    - Verify all secrets are correctly configured
    - Check AWS credentials have sufficient permissions
@@ -262,9 +263,9 @@ Follow these steps to replicate this environment:
    - Confirm all environment variables are set
    - Verify AWS CLI configuration
    - Check Python virtual environment activation
-```
 
-### API Documentation
+
+## API Documentation
 
 ### Health Check
 ```http
@@ -296,6 +297,3 @@ Content-Type: application/json
   "status": "Message sent to SQS"
 }
 ```
-
----
-For more information about the CI/CD process, see the `.github` directory.
