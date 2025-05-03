@@ -253,7 +253,7 @@ Follow these steps to replicate this environment:
 
 6. **Push code for microservice 1 and 2 to github**
    ```bash
-   # CI/CD pipeline for each microservice will start running.
+   # CI/CD pipeline for each microservice will start running, then wait few minutes for the containers to be updated.
    ```
 
 7. **Test the environment**
