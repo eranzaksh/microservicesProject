@@ -2,6 +2,7 @@ import boto3
 import uuid
 import os
 from dotenv import load_dotenv
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 load_dotenv()
 
@@ -11,8 +12,8 @@ s3 = boto3.client('s3', region_name=os.getenv('AWS_REGION'))
 SQS_QUEUE_URL = os.getenv('SQS_QUEUE_URL')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
-# Read messages from queue with cron job
 def process_messages():
+    print("Checking for messages...")
     response = sqs.receive_message(
         QueueUrl=SQS_QUEUE_URL,
         MaxNumberOfMessages=2,
@@ -37,6 +38,8 @@ def process_messages():
         )
         print(f"Processed and uploaded: {filename}")
 
-
 if __name__ == "__main__":
-    process_messages()
+    # Using scheduler to avoid using a while true loop
+    scheduler = BlockingScheduler()
+    scheduler.add_job(process_messages, 'interval', minutes=5)
+    scheduler.start()
