@@ -73,6 +73,38 @@ graph LR
 └── .github/                      # CI/CD configurations
 ```
 
+## API Documentation
+
+### Health Check
+```http
+GET /
+```
+Response: `"OK"` (200)
+
+### Send Email
+```http
+POST /send-email
+Content-Type: application/json
+
+{
+  "token": "your-auth-token",
+  "data": {
+    "email_timestream": "unix_timestamp",
+    "other_email_data": "..."
+  }
+}
+```
+
+#### Validation
+- Token must match SSM parameter store value
+- Timestream must be valid Unix timestamp (1970-2100)
+
+#### Success Response
+```json
+{
+  "status": "Message sent to SQS"
+}
+```
 
 ## Configuration
 
@@ -264,36 +296,5 @@ Follow these steps to replicate this environment:
    - Verify AWS CLI configuration
    - Check Python virtual environment activation
 
-
-## API Documentation
-
-### Health Check
-```http
-GET /
-```
-Response: `"OK"` (200)
-
-### Send Email
-```http
-POST /send-email
-Content-Type: application/json
-
-{
-  "token": "your-auth-token",
-  "data": {
-    "email_timestream": "unix_timestamp",
-    "other_email_data": "..."
-  }
-}
-```
-
-#### Validation
-- Token must match SSM parameter store value
-- Timestream must be valid Unix timestamp (1970-2100)
-
-#### Success Response
-```json
-{
-  "status": "Message sent to SQS"
-}
-```
+---
+For more information about the CI/CD process, see the `.github` directory.
