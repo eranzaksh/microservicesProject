@@ -43,7 +43,6 @@ graph LR
 - **SQS**: Message queue ("devops-queue") with 30s visibility timeout
 - **S3**: Storage bucket ("devops-assn-bucket-eranzaksh")
 - **SSM**: Parameter Store for token management
-- **ECR**: Container registry for service images
 - **VPC**: Network isolation with public/private subnets
 
 
